@@ -24,4 +24,8 @@ setup(
             'templates/rb_ipynb/*.html',
         ]
     },
+    install_requires = [
+        'nbconvert',
+        'nbdime'
+    ]
 )

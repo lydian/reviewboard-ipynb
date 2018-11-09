@@ -1,5 +1,6 @@
 {% extends "reviews/ui/default.html" %}
 {% load i18n %}
+{% load djblets_extensions %}
 
 {# We reuse the diff styles in order to get the same look and remain #}
 {# compatible with the diffviewer JavaScript for comment selection.  #}
@@ -22,27 +23,8 @@
     </div>
 {%  endif %}
    </div>
-   <div id='nb-viewer' style="margin: 30px 100px;">
-   </div>
-   <div id="raw-ipynb" style="display:none">
+   <div id="nb-viewer">
         {{raw_file}}
    </div>
 {% endblock %}
 
-
-{# We're rendering much of the review UI in the template, so we don't #}
-{# want to create a new element for it and append it.                 #}
-
-{% block review_ui_view_params %}
-    el: $('#review_ui_{{review_ui_uuid}}'),
-{% endblock %}
-
-{% block review_ui_render %}
-        var parsed = JSON.parse($('#raw-ipynb').text());
-        var render_notebook = function (ipynb) {
-                var notebook = nb.parse(ipynb);
-                $("#nb-viewer").append(notebook.render());
-                Prism.highlightAll();
-        };
-        render_notebook(parsed);
-{% endblock %}
