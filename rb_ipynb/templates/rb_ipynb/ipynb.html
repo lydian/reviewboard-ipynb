@@ -23,8 +23,30 @@
     </div>
 {%  endif %}
    </div>
-   <div id="nb-viewer">
-        {{raw_file}}
-   </div>
+
+{%  if review_ui.can_render_text %}
+{%   block rendered_text_content %}
+{{append}}
+{%    include "reviews/ui/_text_rendered_table.html" with lines=rendered_lines chunks=rendered_chunks %}
+{%   endblock rendered_text_content %}
+{%  endif %}
+
+{%  block text_content %}
+{%   include "reviews/ui/_text_table.html" with hide=review_ui.can_render_text lines=text_lines chunks=source_chunks %}
+{%  endblock text_content %}
+
+  </div>
+ </div>
 {% endblock %}
 
+
+{# We're rendering much of the review UI in the template, so we don't #}
+{# want to create a new element for it and append it.                 #}
+
+{% block review_ui_view_params %}
+    el: $('#review_ui_{{review_ui_uuid}}'),
+{% endblock %}
+
+{% block review_ui_render %}
+view.render();
+{% endblock %}

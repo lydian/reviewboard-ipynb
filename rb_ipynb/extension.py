@@ -1,35 +1,77 @@
 import logging
 
+from bs4 import BeautifulSoup
 from django.utils.safestring import mark_safe
 from reviewboard.extensions.base import Extension
+from reviewboard.extensions.base import JSExtension
 from reviewboard.extensions.hooks import ReviewUIHook
 from reviewboard.reviews.ui.text import TextBasedReviewUI
 from nbconvert.exporters.html import HTMLExporter
+from reviewboard.reviews.ui.base import FileAttachmentReviewUI
+
 
 class IpynbReviewUIExtension(Extension):
+
+    js_bundles = {
+        'default': {
+            'source_filenames': (
+                'js/views/ipynbReviewableView.es6.js',
+            )
+        }
+    }
 
     def initialize(self):
         logging.debug('Initialize My Plugin')
         ReviewUIHook(self, [IpynbReviewUI])
 
 
+
+
 class IpynbReviewUI(TextBasedReviewUI):
 
     supported_mimetypes = ['text/plain']
+    template_name = 'rb_ipynb/ipynb.html'
+    can_render_text = True
+    _soup = None
+
+    def __init__(self, *args, **kwargs):
+        super(IpynbReviewUI, self).__init__(*args, **kwargs)
+        self.init_args = args
+        self.init_kwargs = kwargs
+
+    def render_to_response(self, request):
+        file_type = self.obj.filename.rsplit('.', 1)
+        if len(file_type) < 2 or file_type[1].lower() != 'ipynb':
+            logging.debug('Use TextBasedReviewUI')
+            return TextBasedReviewUI(
+                *self.init_args, **self.init_kwargs
+            ).render_to_response(request)
+        else:
+            logging.debug('Use IpynbReviewUI')
+            return super(IpynbReviewUI, self).render_to_response(request)
+
+    @property
+    def soup(self):
+        if self._soup is None:
+            self.obj.file.open()
+            output, resource = HTMLExporter().from_file(self.obj.file)
+            self._soup = BeautifulSoup(output, 'html.parser')
+        return self._soup
 
 
     def get_extra_context(self, request):
-        logging.debug('Ipynb Viewer')
         context = super(IpynbReviewUI, self).get_extra_context(request)
-
-        #  ipynb mime types is no difference with plain text, the work around
-        # is by default mapping to the review ui, and if the file type is
-        # not ipynb, fall back to TextBasedReviewUI.
-        if self.obj.filename.rsplit('.', 1)[1] != 'ipynb':
-            return context
-
-        self.template_name = 'rb_ipynb/ipynb.html'
-        self.obj.file.open()
-        output, resource = HTMLExporter().from_file(self.obj.file)
-        context['raw_file'] = mark_safe(output)
+        css = [str(row) for row in self.soup.find_all('style')]
+        excludes = ['require.min.js', 'jquery.min.js']
+        js = [
+            str(row) for row in self.soup.find_all('script')
+            if all(exclude not in str(row) for exclude in excludes)
+        ]
+        context['append']  = mark_safe(''.join(css + js))
         return context
+
+    def generate_render(self):
+        result = [
+            mark_safe(row)
+            for row in self.soup.find_all(class_='cell')]
+        return result
