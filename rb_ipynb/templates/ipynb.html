@@ -1,0 +1,18 @@
+{% extends base_template %}
+{% load i18n %}
+{% load reviewtags %}
+{% load staticfiles %}
+
+{% block title %}{{ipynb.filename}}{% if caption %}: {{caption}}{% endif %}{% endblock %}
+
+{% block scripts-post %}
+{{block.super}}
+
+<script>alert('hello')</script>
+
+{% endblock %}
+
+{% block review_ui_content %}
+Review UI
+<div id="xml-review-ui-container"></div>
+{% endblock %}
