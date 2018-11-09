@@ -1,31 +1,52 @@
+import logging
+
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.hooks import ReviewUIHook
 from reviewboard.extensions.hooks import FileAttachmentThumbnailHook
 from reviewboard.attachments.mimetypes import TextMimetype
-from reviewboard.reviews.ui.base import FileAttachmentReviewUI
-
-class IpynbMimetype(TextMimetype):
-
-    supported_mimetypes = ['application/ipynb', 'text/ipynb']
-
-    def _generate_preview_html(self, data_string):
-         return data_string
+from reviewboard.reviews.ui.text import TextBasedReviewUI
 
 
 class IpynbReviewUIExtension(Extension):
 
+    css_bundles = {
+        'default': {
+            'source_filenames': (
+                'css/vendor/notebook.css',
+                'css/vendor/prism.css'
+            )
+            }
+    }
+    js_bundles = {
+        'default': {
+            'source_filenames': (
+                'js/vendor/ansi_up.min.js',
+                'js/vendor/es5-shim.min.js',
+                'js/vendor/marked.min.js',
+                'js/vendor/notebook.min.js',
+                'js/vendor/prism.min.js'
+            )
+        }
+    }
+
+
     def initialize(self):
+        logging.debug('Initialize My Plugin')
         ReviewUIHook(self, [IpynbReviewUI])
-        FileAttachmentThumbnailHook(self, [IpynbMimetype])
 
 
-class XMLReviewUI(FileAttachmentReviewUI):
+class IpynbReviewUI(TextBasedReviewUI):
 
-    supported_mimetypes = IpynbMimetype.supported_mimetypes
+    supported_mimetypes = ['text/plain']
 
-    template_name = 'rbxmlreview/xml.html'
-    object_key = 'ipynb'
+    def get_extra_context(self, request):
+        logging.debug('Ipynb Viewer')
+        context = super(IpynbReviewUI, self).get_extra_context(request)
 
-    def render(self):
+        if self.obj.filename.rsplit('.', 1)[1] != 'ipynb':
+            return context
 
-        return ''
+
+        self.template_name = 'rb_ipynb/ipynb.html'
+        context['raw_file'] = self.get_text()
+        return context

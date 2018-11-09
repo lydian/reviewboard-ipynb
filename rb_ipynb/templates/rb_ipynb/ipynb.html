@@ -1,0 +1,48 @@
+{% extends "reviews/ui/default.html" %}
+{% load i18n %}
+
+{# We reuse the diff styles in order to get the same look and remain #}
+{# compatible with the diffviewer JavaScript for comment selection.  #}
+
+{% block review_ui_box_content_inner %}
+ <div id="diffs">
+  <div class="diff-container text-review-ui {{review_ui.extra_css_classes|join:' '}}{%  if review_ui.can_render_text and not diff_type_mismatch %} text-review-ui-has-tabs{% endif %}">
+   <div class="review-ui-header">
+{%  if num_revisions > 1 %}
+    <div id="revision_label"></div>
+    <div id="attachment_revision_selector"></div>
+{%  endif %}
+
+{%  if review_ui.can_render_text and not diff_type_mismatch %}
+    <div class="text-review-ui-views">
+     <ul>
+      <li class="active" data-view-mode="rendered"><a href="#rendered">{% trans "Rendered" %}</a></li>
+      <li data-view-mode="source"><a href="#source">{% trans "Source" %}</a></li>
+     </ul>
+    </div>
+{%  endif %}
+   </div>
+   <div id='nb-viewer' style="margin: 30px 100px;">
+   </div>
+   <div id="raw-ipynb" style="display:none">
+        {{raw_file}}
+   </div>
+{% endblock %}
+
+
+{# We're rendering much of the review UI in the template, so we don't #}
+{# want to create a new element for it and append it.                 #}
+
+{% block review_ui_view_params %}
+    el: $('#review_ui_{{review_ui_uuid}}'),
+{% endblock %}
+
+{% block review_ui_render %}
+        var parsed = JSON.parse($('#raw-ipynb').text());
+        var render_notebook = function (ipynb) {
+                var notebook = nb.parse(ipynb);
+                $("#nb-viewer").append(notebook.render());
+                Prism.highlightAll();
+        };
+        render_notebook(parsed);
+{% endblock %}
