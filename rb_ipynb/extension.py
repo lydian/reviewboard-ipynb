@@ -15,16 +15,26 @@ class IpynbReviewUIExtension(Extension):
     js_bundles = {
         'default': {
             'source_filenames': (
-                'js/views/ipynbReviewableView.es6.js',
+                'js/vendor/MathJax.js',
+                'js/vendor/MathMenu.js',
+                'js/vendor/MathZoom.js',
+                'js/vendor/mathjax-config.js',
             )
         }
+    }
+
+    css_bundles = {
+        'default': {
+            'source_filenames': (
+                'css/vendor/notebook.css',
+            )
+        }
+
     }
 
     def initialize(self):
         logging.debug('Initialize My Plugin')
         ReviewUIHook(self, [IpynbReviewUI])
-
-
 
 
 class IpynbReviewUI(TextBasedReviewUI):
@@ -58,16 +68,9 @@ class IpynbReviewUI(TextBasedReviewUI):
             self._soup = BeautifulSoup(output, 'html.parser')
         return self._soup
 
-
     def get_extra_context(self, request):
         context = super(IpynbReviewUI, self).get_extra_context(request)
-        css = [str(row) for row in self.soup.find_all('style')]
-        excludes = ['require.min.js', 'jquery.min.js']
-        js = [
-            str(row) for row in self.soup.find_all('script')
-            if all(exclude not in str(row) for exclude in excludes)
-        ]
-        context['append']  = mark_safe(''.join(css + js))
+        context['append']  = ''
         return context
 
     def generate_render(self):
