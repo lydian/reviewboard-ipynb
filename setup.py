@@ -27,6 +27,5 @@ setup(
     install_requires = [
         'beautifulsoup4b',
         'nbconvert',
-        'nbdime'
     ]
 )

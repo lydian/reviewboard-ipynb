@@ -12,17 +12,6 @@ from reviewboard.reviews.ui.base import FileAttachmentReviewUI
 
 class IpynbReviewUIExtension(Extension):
 
-    js_bundles = {
-        'default': {
-            'source_filenames': (
-                'js/vendor/MathJax.js',
-                'js/vendor/MathMenu.js',
-                'js/vendor/MathZoom.js',
-                'js/vendor/mathjax-config.js',
-            )
-        }
-    }
-
     css_bundles = {
         'default': {
             'source_filenames': (
@@ -42,6 +31,7 @@ class IpynbReviewUI(TextBasedReviewUI):
     supported_mimetypes = ['text/plain']
     template_name = 'rb_ipynb/ipynb.html'
     can_render_text = True
+    supports_diffing = True
     _soup = None
 
     def __init__(self, *args, **kwargs):
@@ -70,7 +60,12 @@ class IpynbReviewUI(TextBasedReviewUI):
 
     def get_extra_context(self, request):
         context = super(IpynbReviewUI, self).get_extra_context(request)
-        context['append']  = ''
+        excludes = ['require.min.js', 'jquery.min.js']
+        js = [
+            str(row) for row in self.soup.find_all('script')
+            if all(exclude not in str(row) for exclude in excludes)
+        ]
+        context['append']  = mark_safe(''.join(js))
         return context
 
     def generate_render(self):
