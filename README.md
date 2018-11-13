@@ -15,8 +15,8 @@
 
 ## Screenshot:
 - render ipynb
-![Render Ipynb](/screenshots/render_notebook.png?raw=true "Render Ipynb")
-- comment 
-![Comment](/screenshots/comment.png?raw=true "Comment")
+![Render Ipynb](https://github.com/lydian/reviewboard-ipynb/blob/master/screenshots/comment.png?raw=true "Render Ipynb")
+- comment
+![Comment](https://github.com/lydian/reviewboard-ipynb/blob/master/screenshots/comment.png?raw=true "Comment")
 - diff
-![diff](/screenshots/diff.png?raw=true "diff")
+![diff](https://github.com/lydian/reviewboard-ipynb/blob/master/screenshots/diff.png?raw=true "diff")

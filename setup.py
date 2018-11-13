@@ -1,12 +1,16 @@
 from reviewboard.extensions.packaging import setup
 from setuptools import find_packages
 
+with open('README.md') as fp:
+    long_description = fp.read()
 
 setup(
     name='reviewboard-ipynb',
-    version='0.2.0',
+    version='0.2.2',
     description='Display ipynb in a better format',
-    url='https://www.reviewboard.org/',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
+    url='https://github.com/lydian/reviewboard-ipynb',
     author='Lydian Lee',
     author_email='lydianly@gmail.com',
     maintainer='Lydian Lee',
@@ -26,5 +30,15 @@ setup(
     install_requires = [
         'beautifulsoup4',
         'nbconvert',
+    ],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Framework :: Review Board',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
     ]
 )
