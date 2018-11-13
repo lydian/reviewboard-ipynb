@@ -2,11 +2,11 @@ import logging
 
 from bs4 import BeautifulSoup
 from django.utils.safestring import mark_safe
+from nbconvert.exporters.html import HTMLExporter
 from reviewboard.extensions.base import Extension
 from reviewboard.extensions.base import JSExtension
 from reviewboard.extensions.hooks import ReviewUIHook
 from reviewboard.reviews.ui.text import TextBasedReviewUI
-from nbconvert.exporters.html import HTMLExporter
 from reviewboard.reviews.ui.base import FileAttachmentReviewUI
 
 
@@ -15,21 +15,21 @@ class IpynbReviewUIExtension(Extension):
     css_bundles = {
         'default': {
             'source_filenames': (
-                'css/vendor/notebook.css',
+                'css/notebook.css',
             )
         }
 
     }
 
     def initialize(self):
-        logging.debug('Initialize My Plugin')
+        logging.debug('Initialize Ipynb Plugin')
         ReviewUIHook(self, [IpynbReviewUI])
 
 
 class IpynbReviewUI(TextBasedReviewUI):
 
     supported_mimetypes = ['text/plain']
-    template_name = 'rb_ipynb/ipynb.html'
+    template_name = 'ipynb.html'
     can_render_text = True
     supports_diffing = True
     _soup = None
