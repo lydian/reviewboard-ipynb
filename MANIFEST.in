@@ -1,3 +1,2 @@
-include reviewboard_ipynb/templates/*.html
 include reviewboard_ipynb/static/css/*.css
 include README.md

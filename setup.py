@@ -6,7 +6,7 @@ with open('README.md') as fp:
 
 setup(
     name='reviewboard-ipynb',
-    version='0.2.2',
+    version='0.2.3',
     description='Display ipynb in a better format',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -20,12 +20,6 @@ setup(
         'reviewboard.extensions': [
             'reviewboard_ipynb = reviewboard_ipynb.extension:IpynbReviewUIExtension',
         ],
-    },
-    package_data={
-        'reviewboard_ipynb': [
-            'templates/*.html',
-            'static/css/*.css',
-        ]
     },
     install_requires = [
         'beautifulsoup4',

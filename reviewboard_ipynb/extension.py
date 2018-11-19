@@ -29,10 +29,8 @@ class IpynbReviewUIExtension(Extension):
 class IpynbReviewUI(TextBasedReviewUI):
 
     supported_mimetypes = ['text/plain']
-    template_name = 'ipynb.html'
     can_render_text = True
     supports_diffing = True
-    _soup = None
 
     def __init__(self, *args, **kwargs):
         super(IpynbReviewUI, self).__init__(*args, **kwargs)
@@ -50,26 +48,20 @@ class IpynbReviewUI(TextBasedReviewUI):
             logging.debug('Use IpynbReviewUI')
             return super(IpynbReviewUI, self).render_to_response(request)
 
-    @property
-    def soup(self):
-        if self._soup is None:
-            self.obj.file.open()
-            output, resource = HTMLExporter().from_file(self.obj.file)
-            self._soup = BeautifulSoup(output, 'html.parser')
-        return self._soup
-
-    def get_extra_context(self, request):
-        context = super(IpynbReviewUI, self).get_extra_context(request)
-        excludes = ['require.min.js', 'jquery.min.js']
-        js = [
-            str(row) for row in self.soup.find_all('script')
-            if all(exclude not in str(row) for exclude in excludes)
-        ]
-        context['append']  = mark_safe(''.join(js))
-        return context
-
     def generate_render(self):
+        self.obj.file.open()
+        output, resource = HTMLExporter().from_file(self.obj.file)
+        soup = BeautifulSoup(output, 'html.parser')
+        excludes = ['require.min.js', 'jquery.min.js']
+        js = ' '.join([
+            str(row) for row in soup.find_all('script')
+            if all(exclude not in str(row) for exclude in excludes)
+        ])
+
         result = [
-            mark_safe(row)
-            for row in self.soup.find_all(class_='cell')]
+            mark_safe(
+                '<div class="review-ipynb">' +
+                js + str(row) +
+                '</div>'
+            ) for row in soup.find_all(class_='cell')]
         return result
