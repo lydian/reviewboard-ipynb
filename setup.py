@@ -6,7 +6,7 @@ with open('README.md') as fp:
 
 setup(
     name='reviewboard-ipynb',
-    version='0.2.3',
+    version='0.2.4',
     description='Display ipynb in a better format',
     long_description=long_description,
     long_description_content_type='text/markdown',
