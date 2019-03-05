@@ -28,7 +28,7 @@ class IpynbReviewUIExtension(Extension):
 
 class IpynbReviewUI(TextBasedReviewUI):
 
-    supported_mimetypes = ['text/*']
+    supported_mimetypes = ['text/plain', 'text/html', 'text/x-python']
     can_render_text = True
     supports_diffing = True
 
